@@ -17,22 +17,33 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-function initCounters(noCounters = 4){
+// Get the current snapshot of a counter
+function getSnapshot(counterId){
   const db = getDatabase();
+  const reference = ref(db, 'counters/' + counterId);
+  var data;
+  onValue(reference, (snapshot) => {
+    data = snapshot.val();
+  });
+  return data
+}
+
+// Initialise counters to 0 and offline
+function initCounters(noCounters = 4){
   for (let i = 1; i <=noCounters; i++) {
-    const reference = ref(db, 'counters/' + i);
-    get(child(ref, "counters/"+i)).then((snapshot)=>{
-    var statusmsg = document.getElementById("c" +i+ "statusmsg");
-    if(snapshot.exist()){
-      statusmsg = snapshot.val().status
-    }});
+    updateCounter(i, 0);
+    var counter = document.getElementById("c" + i + "statusbtn");
+    counter.addEventListener('click', function(){changeStatus(i)});
   } 
 }
 
-function updateCounter(counterId, currentNumber = 0, status = "Offline"){
+function updateCounter(counterId, currentNumber = undefined, status = "Offline"){
     const db = getDatabase();
     const reference = ref(db, 'counters/' + counterId);
     
+    if (currentNumber == undefined){
+      currentNumber = getSnapshot(counterId).currentNumber
+    }
     set(reference, {
         currentNumber: currentNumber,
         status: status
@@ -46,30 +57,23 @@ function updateCounter(counterId, currentNumber = 0, status = "Offline"){
 }
 
 function changeStatus(counterId){
-  const db = getDatabase();
-  const reference = ref(db, 'counters/' + counterId);
-  var data;
-  onValue(reference, (snapshot) => {
-    data = snapshot.val();
-  });
-  console.log(data.status);
-  const state = data.status
+  const state = getSnapshot(counterId).status
   if (state == "Online"){
     document.getElementById("c" +counterId+ "statusmsg").innerHTML = "Offline";
     document.getElementById("c" +counterId+ "statusbtn").innerHTML = "Go Online";
-    updateCounter(counterId, 0, "Offline");
+    updateCounter(counterId, undefined, "Offline");
   }
   else if (state == "Offline"){
     document.getElementById("c" +counterId+ "statusmsg").innerHTML = "Online";
     document.getElementById("c" +counterId+ "statusbtn").innerHTML = "Go Offline";
-    updateCounter(counterId, 0, "Online");
+    updateCounter(counterId, undefined, "Online");
   }
 }
 
-// initCounters();
-var c1Status = document.getElementById("c1statusbtn");
-c1Status.addEventListener('click', function(){changeStatus(1)});
-var c1Status = document.getElementById("c2statusbtn");
-c1Status.addEventListener('click', function(){updateCounter(1, "Hi!", "Online")});
-var c1Status = document.getElementById("c3statusbtn");
-c1Status.addEventListener('click', function(){updateCounter(3, "Hi!", "Online")});
+initCounters();
+// var c1Status = document.getElementById("c1statusbtn");
+// c1Status.addEventListener('click', function(){changeStatus(1)});
+// var c1Status = document.getElementById("c2statusbtn");
+// c1Status.addEventListener('click', function(){updateCounter(1, "Hi!", "Online")});
+// var c1Status = document.getElementById("c3statusbtn");
+// c1Status.addEventListener('click', function(){updateCounter(3, "Hi!", "Online")});
