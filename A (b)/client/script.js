@@ -16,42 +16,6 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// Get the current snapshot of a counter
-function getSnapshot(counterId){
-  const db = getDatabase();
-  const reference = ref(db, 'counters/' + counterId);
-  var data;
-  onValue(reference, (snapshot) => {
-    data = snapshot.val();
-  });
-  return data
-}
-
-function getNumber(counterId){
-  const db = getDatabase();
-  const reference = ref(db, 'number');
-
-  var data;
-  onValue(reference, (snapshot) => {
-    data = snapshot.val();
-  });
-
-  updateCounter(counterId, data.shift(), "Online");
-
-  if (data.length == 0){
-    data = [0]
-  }
-
-  set(reference, 
-    data
-  )
-  .catch((error) => {
-    alert("Unable to update number: " + error)
-  });
-  
-  console.log(data);
-  return data
-}
 
 function takeNumFunc(){
   const db = getDatabase();
@@ -69,6 +33,9 @@ function takeNumFunc(){
   set(reference, 
     data
   )
+  .then(() => {
+    alert("Your number is: " + givenNum);
+  })
   .catch((error) => {
     alert("Unable to update number: " + error)
   });
@@ -83,7 +50,11 @@ function initCounters(noCounters = 3){
     const reference = ref(db, 'counters/' + i);
     onValue(reference, (snapshot) => {
       console.log(snapshot.val())
-      document.getElementById("c" +i+ "status").innerHTML = snapshot.val().status;
+      if (snapshot.val().status == "Online"){
+        document.getElementById("c" +i+ "status").innerHTML = "&#9989;"
+      } else {
+        document.getElementById("c" +i+ "status").innerHTML = "&#9940;"
+      }
       document.getElementById("c" +i+ "num").innerHTML = snapshot.val().currentNumber;
     });
 
@@ -92,38 +63,10 @@ function initCounters(noCounters = 3){
   const reference = ref(db, 'currentServing');
   onValue(reference, (snapshot) => {
     console.log(snapshot.val())
-    document.getElementById("nowServing").innerHTML = "Now Serving: " + snapshot.val();
+    document.getElementById("nowServing").innerHTML = "Now Serving: " + (parseInt(snapshot.val())+1);
   });
   const takeNum = document.getElementById("takeNum");
   takeNum.addEventListener('click', function(){takeNumFunc()});
-}
-
-function updateCounter(counterId, currentNumber = undefined, status = "Offline"){
-    const db = getDatabase();
-    const reference = ref(db, 'counters/' + counterId);
-    
-    if (currentNumber == undefined){
-      currentNumber = getSnapshot(counterId).currentNumber
-    }
-    set(reference, {
-        currentNumber: currentNumber,
-        status: status
-    })
-    .catch((error) => {
-      alert("Unable to update counter: " + error)
-    });
-}
-
-function changeStatus(counterId){
-  const state = getSnapshot(counterId).status
-  if (state == "Online"){
-    document.getElementById("c" +counterId+ "statusbtn").innerHTML = "Go Online";
-    updateCounter(counterId, undefined, "Offline");
-  }
-  else if (state == "Offline"){
-    document.getElementById("c" +counterId+ "statusbtn").innerHTML = "Go Offline";
-    updateCounter(counterId, undefined, "Online");
-  }
 }
 
 initCounters();

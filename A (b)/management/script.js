@@ -38,7 +38,7 @@ function getNumber(counterId){
   });
 
   const servingNumber = data.shift()
-  updateCounter(counterId, servingNumber, "Online");
+  updateCounter(counterId, servingNumber, "Offline");
 
   if (data.length == 0){
     data = [0]
@@ -72,7 +72,14 @@ function initCounters(noCounters = 3){
     counter.addEventListener('click', function(){changeStatus(i)});
     var counter = document.getElementById("c" + i + "nextno");
     counter.addEventListener('click', function(){getNumber(i)});
+    const db = getDatabase();
+    const reference = ref(db, 'counters/' + i);
+    onValue(reference, (snapshot) => {
+      document.getElementById("c" +i+ "statusbtn").innerHTML = (snapshot.val().status == 'Online' ? "Go Offline" : "Go Online");
+    });
   } 
+
+  
 }
 
 function updateCounter(counterId, currentNumber = undefined, status = "Offline"){
@@ -94,11 +101,11 @@ function updateCounter(counterId, currentNumber = undefined, status = "Offline")
 function changeStatus(counterId){
   const state = getSnapshot(counterId).status
   if (state == "Online"){
-    document.getElementById("c" +counterId+ "statusbtn").innerHTML = "Go Online";
+    // document.getElementById("c" +counterId+ "statusbtn").innerHTML = "Go Online";
     updateCounter(counterId, undefined, "Offline");
   }
   else if (state == "Offline"){
-    document.getElementById("c" +counterId+ "statusbtn").innerHTML = "Go Offline";
+    // document.getElementById("c" +counterId+ "statusbtn").innerHTML = "Go Offline";
     updateCounter(counterId, undefined, "Online");
   }
 }
