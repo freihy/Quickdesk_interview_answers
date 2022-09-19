@@ -1,6 +1,6 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "https://www.gstatic.com/firebasejs/9.10.0/firebase-app.js";
-import { getDatabase, ref, set, get, child, onValue } from 'https://www.gstatic.com/firebasejs/9.10.0/firebase-database.js'
+import { getDatabase, ref, set, onValue } from 'https://www.gstatic.com/firebasejs/9.10.0/firebase-database.js'
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -85,12 +85,10 @@ function updateCounter(counterId, currentNumber = undefined, status = "Offline")
 function changeStatus(counterId){
   const state = getSnapshot(counterId).status
   if (state == "Online"){
-    document.getElementById("c" +counterId+ "statusmsg").innerHTML = "Offline";
     document.getElementById("c" +counterId+ "statusbtn").innerHTML = "Go Online";
     updateCounter(counterId, undefined, "Offline");
   }
   else if (state == "Offline"){
-    document.getElementById("c" +counterId+ "statusmsg").innerHTML = "Online";
     document.getElementById("c" +counterId+ "statusbtn").innerHTML = "Go Offline";
     updateCounter(counterId, undefined, "Online");
   }
