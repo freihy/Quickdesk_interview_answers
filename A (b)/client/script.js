@@ -16,20 +16,22 @@ const firebaseConfig = {
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-
 function takeNumFunc(){
+
+  // Connect to DB
   const db = getDatabase();
   const reference = ref(db, 'number');
-
   var data;
   onValue(reference, (snapshot) => {
     data = snapshot.val();
   });
 
-  console.log(data);
+  // Get number last in queue, add 1
   var givenNum = parseInt(data[data.length-1] + 1)
+  // Add to queue
   data.push(givenNum);
 
+  // Push to cloud, announce number 
   set(reference, 
     data
   )
@@ -40,11 +42,13 @@ function takeNumFunc(){
     alert("Unable to update number: " + error)
   });
 
+  // Update "Last Number" on HTML
   document.getElementById("lastNum").innerHTML = "Last Number: " + givenNum;
 }
 
-// Initialise counters to 0 and offline
 function initCounters(noCounters = 3){
+
+  // Sync counter elements
   for (let i = 1; i <=noCounters; i++) {
     const db = getDatabase();
     const reference = ref(db, 'counters/' + i);
@@ -57,8 +61,9 @@ function initCounters(noCounters = 3){
       }
       document.getElementById("c" +i+ "num").innerHTML = snapshot.val().currentNumber;
     });
-
   } 
+
+  // Sync now serving 
   const db = getDatabase();
   const reference = ref(db, 'currentServing');
   onValue(reference, (snapshot) => {

@@ -13,7 +13,6 @@ const firebaseConfig = {
     appId: "1:216896784767:web:67da10d591c97c73baf24a"
   };
   
-
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
@@ -29,24 +28,30 @@ function getSnapshot(counterId){
 }
 
 function getNumber(counterId){
+  // Connect to DB
   const db = getDatabase();
   var reference = ref(db, 'number');
-
   var data;
   onValue(reference, (snapshot) => {
     data = snapshot.val();
   });
 
+  // Get first number in queue
   const servingNumber = data.shift()
 
+  // If there's no numbers left, return 
   if (data.length == 0){
+    if (data == [0]){
+      alert("No tickets in waiting queue")
+      return
+    }
     data = [0]
-    alert("No tickets in waiting queue")
-    return
   }
 
+  // Update counter to be offline
   updateCounter(counterId, servingNumber, "Offline");
 
+  // Update the queue
   set(reference, 
     data
   )
@@ -54,6 +59,7 @@ function getNumber(counterId){
     alert("Unable to update number: " + error)
   });
 
+  // Update the latest served 
   reference = ref(db, 'currentServing');
   set(reference, 
     servingNumber
@@ -62,13 +68,12 @@ function getNumber(counterId){
     alert("Unable to update number: " + error)
   });
 
-  
-  console.log(data);
   return data
 }
 
-// Initialise counters to 0 and offline
 function initCounters(noCounters = 3){
+  // Initialise counters to 0 and offline
+  // TODO - Make noCounters actually dynamic?
   for (let i = 1; i <=noCounters; i++) {
     updateCounter(i, 0);
     var counter = document.getElementById("c" + i + "statusbtn");
@@ -83,11 +88,10 @@ function initCounters(noCounters = 3){
       document.getElementById("c" +i+ "statusbtn").innerHTML = (snapshot.val().status == 'Online' ? "Go Offline" : "Go Online");
     });
   } 
-
-  
 }
 
 function updateCounter(counterId, currentNumber = undefined, status = "Offline"){
+  // General function to update a counter's params
     const db = getDatabase();
     const reference = ref(db, 'counters/' + counterId);
     
@@ -104,13 +108,12 @@ function updateCounter(counterId, currentNumber = undefined, status = "Offline")
 }
 
 function changeStatus(counterId){
+  // Simple switch to turn counter offline/offline
   const state = getSnapshot(counterId).status
   if (state == "Online"){
-    // document.getElementById("c" +counterId+ "statusbtn").innerHTML = "Go Online";
     updateCounter(counterId, undefined, "Offline");
   }
   else if (state == "Offline"){
-    // document.getElementById("c" +counterId+ "statusbtn").innerHTML = "Go Offline";
     updateCounter(counterId, undefined, "Online");
   }
 }
