@@ -56,7 +56,7 @@ function getNumber(counterId){
 }
 
 // Initialise counters to 0 and offline
-function initCounters(noCounters = 4){
+function initCounters(noCounters = 3){
   for (let i = 1; i <=noCounters; i++) {
     updateCounter(i, 0);
     var counter = document.getElementById("c" + i + "statusbtn");
