@@ -88,6 +88,12 @@ function initCounters(noCounters = 3){
     });
 
   } 
+  const db = getDatabase();
+  const reference = ref(db, 'currentServing');
+  onValue(reference, (snapshot) => {
+    console.log(snapshot.val())
+    document.getElementById("nowServing").innerHTML = "Now Serving: " + snapshot.val();
+  });
   const takeNum = document.getElementById("takeNum");
   takeNum.addEventListener('click', function(){takeNumFunc()});
 }

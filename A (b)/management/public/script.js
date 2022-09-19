@@ -30,14 +30,15 @@ function getSnapshot(counterId){
 
 function getNumber(counterId){
   const db = getDatabase();
-  const reference = ref(db, 'number');
+  var reference = ref(db, 'number');
 
   var data;
   onValue(reference, (snapshot) => {
     data = snapshot.val();
   });
 
-  updateCounter(counterId, data.shift(), "Online");
+  const servingNumber = data.shift()
+  updateCounter(counterId, servingNumber, "Online");
 
   if (data.length == 0){
     data = [0]
@@ -45,6 +46,14 @@ function getNumber(counterId){
 
   set(reference, 
     data
+  )
+  .catch((error) => {
+    alert("Unable to update number: " + error)
+  });
+
+  reference = ref(db, 'currentServing');
+  set(reference, 
+    servingNumber
   )
   .catch((error) => {
     alert("Unable to update number: " + error)
