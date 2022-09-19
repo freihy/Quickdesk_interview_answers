@@ -38,14 +38,14 @@ function updateCounter(counterId, currentNumber = 0, status = "Offline"){
         status: status
     })
     .then(() => {
-      alert("Updated Counter")
+      // alert("Updated Counter")
     })
     .catch((error) => {
       alert("Unable to update counter: " + error)
     });
 }
 
-function changeStatus(counterId, state){
+function changeStatus(counterId){
   const db = getDatabase();
   const reference = ref(db, 'counters/' + counterId);
   var data;
@@ -53,15 +53,22 @@ function changeStatus(counterId, state){
     data = snapshot.val();
   });
   console.log(data.status);
-  document.getElementById("c" +counterId+ "statusmsg").innerHTML = state;
-  updateCounter(counterId, 0, state);
+  const state = data.status
+  if (state == "Online"){
+    document.getElementById("c" +counterId+ "statusmsg").innerHTML = "Offline";
+    document.getElementById("c" +counterId+ "statusbtn").innerHTML = "Go Online";
+    updateCounter(counterId, 0, "Offline");
+  }
+  else if (state == "Offline"){
+    document.getElementById("c" +counterId+ "statusmsg").innerHTML = "Online";
+    document.getElementById("c" +counterId+ "statusbtn").innerHTML = "Go Offline";
+    updateCounter(counterId, 0, "Online");
+  }
 }
 
 // initCounters();
-var c1Status = document.getElementById("c1statusbtnon");
-c1Status.addEventListener('click', function(){changeStatus(1, "Online")});
-var c1Status = document.getElementById("c1statusbtnoff");
-c1Status.addEventListener('click', function(){changeStatus(1, "Offline")});
+var c1Status = document.getElementById("c1statusbtn");
+c1Status.addEventListener('click', function(){changeStatus(1)});
 var c1Status = document.getElementById("c2statusbtn");
 c1Status.addEventListener('click', function(){updateCounter(1, "Hi!", "Online")});
 var c1Status = document.getElementById("c3statusbtn");
