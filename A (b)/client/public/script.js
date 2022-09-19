@@ -48,10 +48,32 @@ function getNumber(counterId){
   .catch((error) => {
     alert("Unable to update number: " + error)
   });
-
   
   console.log(data);
   return data
+}
+
+function takeNumFunc(){
+  const db = getDatabase();
+  const reference = ref(db, 'number');
+
+  var data;
+  onValue(reference, (snapshot) => {
+    data = snapshot.val();
+  });
+
+  console.log(data);
+  var givenNum = parseInt(data[data.length-1] + 1)
+  data.push(givenNum);
+
+  set(reference, 
+    data
+  )
+  .catch((error) => {
+    alert("Unable to update number: " + error)
+  });
+
+  document.getElementById("lastNum").innerHTML = "Last Number: " + givenNum;
 }
 
 // Initialise counters to 0 and offline
@@ -61,10 +83,13 @@ function initCounters(noCounters = 3){
     const reference = ref(db, 'counters/' + i);
     onValue(reference, (snapshot) => {
       console.log(snapshot.val())
+      document.getElementById("c" +i+ "status").innerHTML = snapshot.val().status;
       document.getElementById("c" +i+ "num").innerHTML = snapshot.val().currentNumber;
     });
 
   } 
+  const takeNum = document.getElementById("takeNum");
+  takeNum.addEventListener('click', function(){takeNumFunc()});
 }
 
 function updateCounter(counterId, currentNumber = undefined, status = "Offline"){
