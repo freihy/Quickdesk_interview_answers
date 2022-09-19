@@ -1,5 +1,18 @@
 {
   "projects": {
     "default": "queuebot-8382b"
-  }
+  },
+  "targets": {
+    "queuebot-8382b": {
+      "hosting": {
+        "client": [
+          "queuebot-client"
+        ],
+        "management": [
+          "queuebot-management"
+        ]
+      }
+    }
+  },
+  "etags": {}
 }

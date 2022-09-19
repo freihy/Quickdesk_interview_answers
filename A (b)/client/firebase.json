@@ -2,14 +2,26 @@
   "database": {
     "rules": "database.rules.json"
   },
-  "hosting": {
-    "public": "public",
+  "hosting": [
+    {
+    "target": "client",
+    "public": "client",
     "ignore": [
       "firebase.json",
       "**/.*",
       "**/node_modules/**"
     ]
-  },
+    },
+    {
+      "target": "management",
+      "public": "management",
+      "ignore": [
+        "firebase.json",
+        "**/.*",
+        "**/node_modules/**"
+      ]
+      }
+],
   "emulators": {
     "database": {
       "port": 9000
