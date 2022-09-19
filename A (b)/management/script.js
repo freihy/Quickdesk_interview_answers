@@ -38,11 +38,14 @@ function getNumber(counterId){
   });
 
   const servingNumber = data.shift()
-  updateCounter(counterId, servingNumber, "Offline");
 
   if (data.length == 0){
     data = [0]
+    alert("No tickets in waiting queue")
+    return
   }
+
+  updateCounter(counterId, servingNumber, "Offline");
 
   set(reference, 
     data
@@ -70,8 +73,10 @@ function initCounters(noCounters = 3){
     updateCounter(i, 0);
     var counter = document.getElementById("c" + i + "statusbtn");
     counter.addEventListener('click', function(){changeStatus(i)});
-    var counter = document.getElementById("c" + i + "nextno");
+    counter = document.getElementById("c" + i + "nextno");
     counter.addEventListener('click', function(){getNumber(i)});
+    counter = document.getElementById("c" + i + "complete");
+    counter.addEventListener('click', function(){updateCounter(i,"Waiting","Online")});
     const db = getDatabase();
     const reference = ref(db, 'counters/' + i);
     onValue(reference, (snapshot) => {
